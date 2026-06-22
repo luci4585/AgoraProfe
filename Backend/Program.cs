@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json")
                     .Build();
-string? cadenaConexion = configuration.GetConnectionString("mysqlRemote");
+string? cadenaConexion = configuration.GetConnectionString("mysqlLocal");
 
 //configuración de inyección de dependencias del DBContext
 builder.Services.AddDbContext<AgoraContext>(

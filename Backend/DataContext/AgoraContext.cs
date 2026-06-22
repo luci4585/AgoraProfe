@@ -90,17 +90,6 @@ namespace Backend.DataContext
 
 
 
-
-
-
-
-
-
-
-
-
-
-
             // Configuramos las querys para que no devuelvan los elementos eliminados
             modelBuilder.Entity<TipoInscripcion>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<Usuario>().HasQueryFilter(p => !p.IsDeleted);
