@@ -1,13 +1,13 @@
+using Backend.Class;
 using Backend.DataContext;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
 DotNetEnv.Env.Load();
-
-var builder = WebApplication.CreateBuilder(args);
 
 var firebaseJson = Environment.GetEnvironmentVariable("GOOGLE_CREDENTIALS");
 
@@ -23,6 +23,7 @@ FirebaseApp.Create(new AppOptions
     Credential = credential
 });
 
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddAuthentication("Firebase")
@@ -30,34 +31,24 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-// Add services to the container.
-
-builder.Services.AddControllers();
 var configuration = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables()
-    .Build();
-
-//string cadenaConexion = configuration.GetConnectionString("mysqlRemote");
-var cadenaConexion = configuration.GetConnectionString("postgresRemote");
-
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+string? cadenaConexion = configuration.GetConnectionString("mysqlLocal");
 
 //configuración de inyección de dependencias del DBContext
-//builder.Services.AddDbContext<BiblioContext>(
-//    options => options.UseMySql(cadenaConexion,
-//                                ServerVersion.AutoDetect(cadenaConexion)));
-builder.Services.AddDbContext<BiblioContext>(
-    options => options.UseNpgsql(cadenaConexion,
-        npgsqlOptions => npgsqlOptions.UseVector()));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// Configura el serializador JSON para manejar referencias cíclicas
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    });
+builder.Services.AddDbContext<AgoraContext>(
+    dbOptions => dbOptions.UseMySql(
+        cadenaConexion,
+        ServerVersion.AutoDetect(cadenaConexion),
+        mySqlOptions => mySqlOptions
+            .EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: System.TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null)
+            .EnableStringComparisonTranslations() // Habilita traducción de StringComparison (Contains, StartsWith, etc.)
+    )
+);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -67,7 +58,34 @@ builder.Services.AddControllers()
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Agregar esquema de seguridad JWT
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingrese el token JWT en este formato: Bearer {su token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 // Configurar una política de CORS
 builder.Services.AddCors(options =>
@@ -92,8 +110,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
