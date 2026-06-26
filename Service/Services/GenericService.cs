@@ -1,5 +1,7 @@
-﻿using Service.Interfaces;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Service.Interfaces;
 using Service.Utils;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -10,15 +12,43 @@ namespace Service.Services
         protected readonly HttpClient _httpClient;
         protected readonly JsonSerializerOptions _options;
         protected readonly string _endpoint;
+        protected readonly IMemoryCache? _memoryCache;
 
 
-        public GenericService() {
+        public GenericService(IMemoryCache memoryCache) {
+            _memoryCache = memoryCache;
             _httpClient = new HttpClient();
             _options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
             //_endpoint= Properties.Resources.UrlApi+ApiEndpoints.GetEndpoint(typeof(T).Name);
             _endpoint = Properties.Resources.UrlApiLocal + ApiEndpoints.GetEndpoint(typeof(T).Name);
 
         }
+
+        protected void SetAuthorizationHeader()
+        {
+            // Si ya está configurado (por un DelegatingHandler), no hacer nada
+            if (_httpClient.DefaultRequestHeaders.Authorization is not null)
+                return;
+
+            // 1) Intentar leer desde IMemoryCache (configurado por FirebaseAuthService)
+            if (_memoryCache is not null && _memoryCache.TryGetValue("jwt", out string? cachedToken) && !string.IsNullOrWhiteSpace(cachedToken))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cachedToken);
+                return;
+            }
+
+            // 2) Respaldo: variable estática (evitar uso si no es necesario)
+            if (!string.IsNullOrWhiteSpace(GenericService<object>.jwtToken))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenericService<object>.jwtToken);
+                return;
+            }
+            // Si no se definió el token, se lanza una excepción
+
+            throw new InvalidOperationException("El token JWT no está disponible para la autorización.");
+
+        }
+
         public async Task<T?> AddAsync(T? entity)
         {
             var response = await _httpClient.PostAsJsonAsync(_endpoint, entity);
