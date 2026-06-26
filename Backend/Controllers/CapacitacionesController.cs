@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Backend.DataContext;
 using Service.Models;
 using Backend.ExtensionMethods;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CapacitacionesController : ControllerBase
     {
         private readonly AgoraContext _context;
@@ -27,10 +29,10 @@ namespace Backend.Controllers
         public async Task<ActionResult<IEnumerable<Capacitacion>>> GetCapacitaciones([FromQuery] string? filter = "")
         {
             return await _context.Capacitaciones
-                            .Include(c=> c.TiposDeInscripciones).ThenInclude(t=> t.TipoInscripcion)
-                            .Include(c=> c.Inscripciones).ThenInclude(i=>i.Usuario)
-                            .Include(c=> c.Inscripciones).ThenInclude(i=>i.UsuarioCobro)
-                            .Include(c=> c.Inscripciones).ThenInclude(i=>i.TipoInscripcion)
+                            .Include(c => c.TiposDeInscripciones).ThenInclude(t => t.TipoInscripcion)
+                            .Include(c => c.Inscripciones).ThenInclude(i => i.Usuario)
+                            .Include(c => c.Inscripciones).ThenInclude(i => i.UsuarioCobro)
+                            .Include(c => c.Inscripciones).ThenInclude(i => i.TipoInscripcion)
                             .Where(c => c.Nombre.Contains(filter, StringComparison.OrdinalIgnoreCase)
                                 || c.Detalle.Contains(filter, StringComparison.OrdinalIgnoreCase)
                                 || c.Ponente.Contains(filter, StringComparison.OrdinalIgnoreCase))
@@ -46,9 +48,9 @@ namespace Backend.Controllers
                                 .Include(c => c.Inscripciones).ThenInclude(i => i.Usuario)
                                 .Include(c => c.Inscripciones).ThenInclude(i => i.UsuarioCobro)
                                 .Include(c => c.Inscripciones).ThenInclude(i => i.TipoInscripcion)
-                                .Where(c => c.InscripcionAbierta && 
+                                .Where(c => c.InscripcionAbierta &&
                                         (c.Nombre.Contains(filter)
-                                            || c.Detalle.Contains(filter) 
+                                            || c.Detalle.Contains(filter)
                                             || c.Ponente.Contains(filter)))
                                 .AsNoTracking()
                                 .ToListAsync();
@@ -61,10 +63,10 @@ namespace Backend.Controllers
                                 .Include(c => c.Inscripciones).ThenInclude(i => i.Usuario)
                                 .Include(c => c.Inscripciones).ThenInclude(i => i.UsuarioCobro)
                                 .Include(c => c.Inscripciones).ThenInclude(i => i.TipoInscripcion)
-                                .Where(c => !c.InscripcionAbierta 
-                                        && c.FechaHora.Date > DateTime.Now.Date 
-                                        && (c.Nombre.Contains(filter) 
-                                            || c.Detalle.Contains(filter) 
+                                .Where(c => !c.InscripcionAbierta
+                                        && c.FechaHora.Date > DateTime.Now.Date
+                                        && (c.Nombre.Contains(filter)
+                                            || c.Detalle.Contains(filter)
                                             || c.Ponente.Contains(filter)))
                                 .AsNoTracking()
                                 .ToListAsync();
@@ -151,7 +153,7 @@ namespace Backend.Controllers
                 inscripcion.TipoInscripcion = null; // Evitar duplicados
             }
 
-            
+
             var inscripcionesAEliminar = capacitacionExistente.Inscripciones
                                                 .Where(t => !capacitacion.Inscripciones
                                                 .Any(ti => ti.Id == t.Id))
@@ -206,7 +208,7 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Capacitacion>> PostCapacitacion(Capacitacion capacitacion)
         {
-            foreach(var tipoInscripcionCapacitacion in capacitacion.TiposDeInscripciones)
+            foreach (var tipoInscripcionCapacitacion in capacitacion.TiposDeInscripciones)
             {
                 _context.Attach(tipoInscripcionCapacitacion.TipoInscripcion);
             }
