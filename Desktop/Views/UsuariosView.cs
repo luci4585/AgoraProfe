@@ -1,6 +1,7 @@
 ﻿using Desktop.ExtensionMethod;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
+using Microsoft.Extensions.Caching.Memory;
 using Service.Enums;
 using Service.Models;
 using Service.Services;
@@ -19,6 +20,8 @@ namespace Desktop.Views
 
         public UsuariosView(IMemoryCache memoryCache)
         {
+            _usuarioService = new UsuarioService(memoryCache);
+            _authService = new AuthService(memoryCache);
             InitializeComponent();
             _ = GetAllData();
             SettingFirebase();
@@ -363,23 +366,6 @@ namespace Desktop.Views
                 MessageBox.Show("Debe seleccionar un usuario a restaurar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        public async Task SendVerificationEmailAsync(string idToken)
-        {
-            var FirebaseApiKey = Service.Properties.Resources.ApiKeyFirebase;
-            var RequestUri = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + FirebaseApiKey;
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var content = new StringContent("{\"requestType\":\"VERIFY_EMAIL\",\"idToken\":\"" + idToken + "\"}");
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                var response = await client.PostAsync(RequestUri, content);
-                response.EnsureSuccessStatusCode();
-            }
-        }
-
 
     }
 }

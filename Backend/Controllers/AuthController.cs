@@ -105,7 +105,10 @@ namespace Backend.Controllers
             }
         }
 
-        private async Task SendVerificationEmailAsync(string idToken)
+        [HttpPost("sendverificationemail")]
+
+
+        public async Task SendVerificationEmailAsync([FromBody]string idToken)
         {
             var RequestUri = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + _config.ApiKey;
             using (var client = new HttpClient())

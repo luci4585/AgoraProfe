@@ -148,6 +148,14 @@ namespace Service.Services
                 throw new Exception("Error al eliminar el usuario en firebase->: " + ex.Message);
             }
         }
+
+        public async Task<bool> SendVerificationEmail(string email) 
+        {
+            if (email == null)
+            {
+                throw new ArgumentException("El objeto emaill no llego."
+            }
+        }
     }
 }
 
