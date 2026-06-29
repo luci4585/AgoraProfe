@@ -59,41 +59,5 @@ namespace Service.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a AIzaSyBcYubUSnxvl3dke68Z5lpyYiZkFvSJX-Q.
-        /// </summary>
-        public static string ApiKeyFirebase {
-            get {
-                return ResourceManager.GetString("ApiKeyFirebase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a agora-75589.firebaseapp.com.
-        /// </summary>
-        public static string AuthDomainFirebase {
-            get {
-                return ResourceManager.GetString("AuthDomainFirebase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a https://apiagora.azurewebsites.net/api/.
-        /// </summary>
-        public static string UrlApi {
-            get {
-                return ResourceManager.GetString("UrlApi", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a https://localhost:7000/api/.
-        /// </summary>
-        public static string UrlApiLocal {
-            get {
-                return ResourceManager.GetString("UrlApiLocal", resourceCulture);
-            }
-        }
     }
 }
