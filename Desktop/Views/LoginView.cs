@@ -39,7 +39,7 @@ namespace Desktop.Views
                 if (login)
                 {
                     this.Hide();
-                    var menuPrincipalView = new MenuPrincipalView();
+                    var menuPrincipalView = new MenuPrincipalView(_memoryCache);
                     menuPrincipalView.ShowDialog();
                     this.Close();
                 }

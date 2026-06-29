@@ -41,15 +41,13 @@ namespace Service.Services
             }
             try
             {
-                var UrlApi = Properties.Resources.UrlApi;
+
                 var endpointAuth = ApiEndpoints.GetEndpoint("Login");
                 var client = new HttpClient();
                 var newUser = new RegisterDTO { Email = email, Password = password, Nombre = nombre };
-                var response = await client.PostAsJsonAsync($"{UrlApi}{endpointAuth}/register/", newUser);
+                var response = await client.PostAsJsonAsync($"{_httpClient.BaseAddress}{endpointAuth}/register/", newUser);
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsStringAsync();
-                    GenericService<object>.jwtToken = result;
                     return true;
                 }
                 else
@@ -75,15 +73,13 @@ namespace Service.Services
             }
             try
             {
-                var urlApi = Properties.Resources.UrlApi;
                 var endpointAuth = ApiEndpoints.GetEndpoint("Login");
                 var client = new HttpClient();
-                var response = await client.PostAsJsonAsync($"{urlApi}{endpointAuth}/login/", login);
+                var response = await client.PostAsJsonAsync($"{_httpClient.BaseAddress}{endpointAuth}/login/", login);
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadAsStringAsync();
-
-                    GenericService<object>.jwtToken = result;
+                    _memoryCache.Set("jwToken", result);
                     return null;
                 }
                 else
@@ -110,10 +106,9 @@ namespace Service.Services
             }
             try
             {
-                var urlApi = Properties.Resources.UrlApi;
                 var endpointAuth = ApiEndpoints.GetEndpoint("Login");
                 var client = new HttpClient();
-                var response = await client.PostAsJsonAsync($"{urlApi}{endpointAuth}/resetpassword/", login);
+                var response = await client.PostAsJsonAsync($"{_httpClient.BaseAddress}{endpointAuth}/resetpassword/", login);
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
@@ -136,10 +131,9 @@ namespace Service.Services
             }
             try
             {
-                var urlApi = Properties.Resources.UrlApi;
                 var endpointAuth = ApiEndpoints.GetEndpoint("Login");
                 var client = new HttpClient();
-                var response = await client.PostAsJsonAsync($"{urlApi}{endpointAuth}/deleteuser/", login);
+                var response = await client.PostAsJsonAsync($"{_httpClient.BaseAddress}{endpointAuth}/deleteuser/", login);
                 if (response.IsSuccessStatusCode)
                 {
                     return true;

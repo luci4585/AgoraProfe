@@ -11,12 +11,13 @@ namespace Desktop.Views
 {
     public partial class UsuariosView : Form
     {
-        GenericService<Usuario> _usuarioService = new();
+        GenericService<Usuario> _usuarioService;
+        AuthService _authService;
         Usuario _currentUsuario;
         List<Usuario>? _usuarios;
         FirebaseAuthClient _firebaseAuthClient;
 
-        public UsuariosView()
+        public UsuariosView(IMemoryCache memoryCache)
         {
             InitializeComponent();
             _ = GetAllData();
