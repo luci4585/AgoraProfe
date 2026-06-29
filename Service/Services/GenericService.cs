@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using DotNetEnv;
+using Microsoft.Extensions.Caching.Memory;
 using Service.Interfaces;
 using Service.Utils;
 using System.Net.Http.Headers;
@@ -9,19 +10,30 @@ namespace Service.Services
 {
     public class GenericService<T> : IGenericService<T> where T : class
     {
-        protected readonly HttpClient _httpClient;
-        protected readonly JsonSerializerOptions _options;
-        protected readonly string _endpoint;
-        protected readonly IMemoryCache? _memoryCache;
+        protected HttpClient _httpClient;
+        protected JsonSerializerOptions _options;
+        protected string _endpoint;
+        protected IMemoryCache? _memoryCache;
 
 
         public GenericService(IMemoryCache memoryCache) {
             _memoryCache = memoryCache;
-            _httpClient = new HttpClient();
-            _options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            //_endpoint= Properties.Resources.UrlApi+ApiEndpoints.GetEndpoint(typeof(T).Name);
-            _endpoint = Properties.Resources.UrlApiLocal + ApiEndpoints.GetEndpoint(typeof(T).Name);
+            SettingHttpClient();
+            _endpoint = ApiEndpoints.GetEndpoint(typeof(T).Name);
 
+        }
+
+        private void SettingHttpClient()
+        {
+            Env.Load();
+            var apiUrl = Environment.GetEnvironmentVariable("API_URL");
+            if (apiUrl == null)
+            {
+                throw new InvalidOperationException("La variable de entorno 'API_URL' no está definida.");
+            }
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(apiUrl);
+            _options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
         }
 
         protected void SetAuthorizationHeader()
@@ -37,12 +49,7 @@ namespace Service.Services
                 return;
             }
 
-            // 2) Respaldo: variable estática (evitar uso si no es necesario)
-            if (!string.IsNullOrWhiteSpace(GenericService<object>.jwtToken))
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenericService<object>.jwtToken);
-                return;
-            }
+
             // Si no se definió el token, se lanza una excepción
 
             throw new InvalidOperationException("El token JWT no está disponible para la autorización.");

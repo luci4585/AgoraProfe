@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,8 +13,10 @@ namespace Desktop.Views
 {
     public partial class SplashView : Form
     {
-        public SplashView()
+        IMemoryCache _memoryCache;
+        public SplashView(IMemoryCache memoryCache)
         {
+            _memoryCache = memoryCache;
             InitializeComponent();
         }
 
@@ -24,7 +27,7 @@ namespace Desktop.Views
             {
                 Timer.Stop();
                 this.Hide();
-                var login = new LoginView();
+                var login = new LoginView(_memoryCache);
                 login.ShowDialog();
                 this.Close();
 

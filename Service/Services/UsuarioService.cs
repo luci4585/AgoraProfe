@@ -32,7 +32,7 @@ namespace Service.Services
                 Username = email,
                 Password = password
             };
-            var response = await _httpClient.PostAsJsonAsync($"{_endpoint}/login", loginDTO);
+            var response = await _httpClient.PostAsJsonAsync($"auth/login", loginDTO);
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {

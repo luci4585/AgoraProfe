@@ -1,5 +1,6 @@
 ﻿using Desktop.ExtensionMethod;
 using Desktop.ViewReports;
+using Microsoft.Extensions.Caching.Memory;
 using Service.Models;
 using Service.Services;
 using System.Data;
@@ -10,14 +11,16 @@ namespace Desktop.Views
 {
     public partial class InscripcionesView : Form
     {
-        GenericService<Capacitacion> _capacitacionService = new();
-        GenericService<Usuario> _usuarioService = new();
-        InscripcionService _inscripcionService = new();
-        List<Inscripcion>? _inscripciones = new();
-        List<Usuario>? _usuarios = new();
+        GenericService<Capacitacion> _capacitacionService;
+        GenericService<Usuario> _usuarioService;
+        InscripcionService _inscripcionService;
+        List<Inscripcion>? _inscripciones;
+        List<Usuario>? _usuarios;
 
-        public InscripcionesView()
+        public InscripcionesView(IMemoryCache memoryCache)
         {
+            _capacitacionService = new GenericService<Capacitacion>(memoryCache);
+            _usuarioService = new GenericService<Usuario>(memoryCache);
             InitializeComponent();
             _ = GetAllData();
         }

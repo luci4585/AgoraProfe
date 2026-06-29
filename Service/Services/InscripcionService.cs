@@ -1,4 +1,5 @@
-﻿using Service.Interfaces;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Service.Interfaces;
 using Service.Models;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,13 @@ namespace Service.Services
 {
     public class InscripcionService : GenericService<Inscripcion>, IInscripcionService
     {
+        public InscripcionService(IMemoryCache? memoryCache = null) : base(memoryCache)
+        { 
+        }
 
         public async Task<List<Inscripcion>?> GetInscriptosAsync(int id)
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.GetAsync($"{_endpoint}/inscriptos/{id}");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)

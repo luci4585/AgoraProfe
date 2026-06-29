@@ -13,6 +13,7 @@ namespace Service.Utils
         public static string Inscripcion { get; set; } = "inscripciones";
         public static string TipoInscripcion { get; set; } = "tiposinscripciones";
         public static string TipoInscripcionCapacitacion { get; set; } = "tiposinscripcionescapacitaciones";
+        public static string Login { get; set; } = "auth";
         
         public static string GetEndpoint(string name)
         {

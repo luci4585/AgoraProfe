@@ -1,4 +1,5 @@
-﻿using Service.Interfaces;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Service.Interfaces;
 using Service.Models;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,13 @@ namespace Service.Services
 {
     public class CapacitacionService : GenericService<Capacitacion>, ICapacitacionService
     {
+        public CapacitacionService(IMemoryCache? memoryCache = null) : base(memoryCache)
+        { 
+        }
 
         public async Task<List<Capacitacion>?> GetCapacitacionesAbiertasAsync()
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.GetAsync($"{_endpoint}/abiertas");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -26,6 +31,7 @@ namespace Service.Services
 
         public async Task<List<Capacitacion>?> GetCapacitacionesFuturasAsync()
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.GetAsync($"{_endpoint}/futuras");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)

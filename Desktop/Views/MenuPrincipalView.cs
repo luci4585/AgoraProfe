@@ -1,11 +1,14 @@
 using Desktop.Views;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Desktop
 {
     public partial class MenuPrincipalView : Form
     {
-        public MenuPrincipalView()
+        IMemoryCache _memoryCache;
+        public MenuPrincipalView(IMemoryCache memoryCache)
         {
+            _memoryCache = memoryCache;
             InitializeComponent();
         }
 
