@@ -14,13 +14,14 @@ namespace Desktop.Views
         GenericService<Capacitacion> _capacitacionService;
         GenericService<Usuario> _usuarioService;
         InscripcionService _inscripcionService;
-        List<Inscripcion>? _inscripciones;
-        List<Usuario>? _usuarios;
+        List<Inscripcion>? _inscripciones = new();
+        List<Usuario>? _usuarios = new();
 
         public InscripcionesView(IMemoryCache memoryCache)
         {
             _capacitacionService = new GenericService<Capacitacion>(memoryCache);
             _usuarioService = new GenericService<Usuario>(memoryCache);
+            _inscripcionService = new InscripcionService(memoryCache);
             InitializeComponent();
             _ = GetAllData();
         }

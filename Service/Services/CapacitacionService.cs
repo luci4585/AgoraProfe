@@ -13,8 +13,8 @@ namespace Service.Services
 {
     public class CapacitacionService : GenericService<Capacitacion>, ICapacitacionService
     {
-        public CapacitacionService(IMemoryCache? memoryCache = null) : base(memoryCache)
-        { 
+        public CapacitacionService(IMemoryCache memoryCache) : base(memoryCache)
+        {
         }
 
         public async Task<List<Capacitacion>?> GetCapacitacionesAbiertasAsync()

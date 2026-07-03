@@ -32,14 +32,16 @@ namespace Service.Services
                 Username = email,
                 Password = password
             };
-            var response = await _httpClient.PostAsJsonAsync($"auth/login", loginDTO);
+            var response = await _httpClient.PostAsJsonAsync($"Auth/login", loginDTO);
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception($"Error al iniciar sesión: {response.StatusCode}");
             }
-            var result = JsonSerializer.Deserialize<string>(content, _options);
-            _memoryCache!.Set("jwt", result);
+            // El endpoint retorna el JWT como string JSON ("token") o texto plano (token).
+            // Se eliminan las comillas del encoding JSON si están presentes.
+            var token = content.Trim('"');
+            _memoryCache!.Set("jwt", token);
             return response.IsSuccessStatusCode;
         }
 

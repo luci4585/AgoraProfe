@@ -13,8 +13,8 @@ namespace Service.Services
 {
     public class InscripcionService : GenericService<Inscripcion>, IInscripcionService
     {
-        public InscripcionService(IMemoryCache? memoryCache = null) : base(memoryCache)
-        { 
+        public InscripcionService(IMemoryCache memoryCache) : base(memoryCache)
+        {
         }
 
         public async Task<List<Inscripcion>?> GetInscriptosAsync(int id)

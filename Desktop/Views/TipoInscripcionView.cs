@@ -1,17 +1,19 @@
-﻿using System.Data;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Service.Models;
 using Service.Services;
+using System.Data;
 
 namespace Desktop.Views
 {
     public partial class TipoInscripcionView : Form
     {
-        GenericService<TipoInscripcion> _tipoInscripcionService = new();
+        GenericService<TipoInscripcion> _tipoInscripcionService;
         TipoInscripcion _currentTipoInscripcion;
         List<TipoInscripcion>? _tiposInscripciones;
 
-        public TipoInscripcionView()
+        public TipoInscripcionView(IMemoryCache memoryCache)
         {
+            _tipoInscripcionService = new GenericService<TipoInscripcion>(memoryCache);
             InitializeComponent();
             _ = GetAllData();
             checkVerEliminados.CheckedChanged += DisplayHideControlsRestoreButton;

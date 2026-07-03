@@ -25,7 +25,7 @@ namespace Service.Services
 
         private void SettingHttpClient()
         {
-            Env.Load();
+            Env.Load("../../../");
             var apiUrl = Environment.GetEnvironmentVariable("API_URL");
             if (apiUrl == null)
             {
@@ -58,6 +58,7 @@ namespace Service.Services
 
         public async Task<T?> AddAsync(T? entity)
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.PostAsJsonAsync(_endpoint, entity);
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -69,6 +70,7 @@ namespace Service.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.DeleteAsync($"{_endpoint}/{id}");
             if (!response.IsSuccessStatusCode)
             {
@@ -80,6 +82,7 @@ namespace Service.Services
 
         public async Task<List<T>?> GetAllAsync(string? filtro="")
         {
+            SetAuthorizationHeader();
             var response= await _httpClient.GetAsync($"{_endpoint}?filter={filtro}");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -92,6 +95,7 @@ namespace Service.Services
 
         public async Task<List<T>?> GetAllDeletedsAsync(string? filtro="")
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.GetAsync($"{_endpoint}/deleteds");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -103,6 +107,7 @@ namespace Service.Services
 
         public async Task<T?> GetByIdAsync(int id)
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.GetAsync($"{_endpoint}/{id}");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -114,6 +119,7 @@ namespace Service.Services
 
         public async Task<bool> RestoreAsync(int id)
         {
+            SetAuthorizationHeader();
             var response = await _httpClient.PutAsync($"{_endpoint}/restore/{id}",null);
             if (!response.IsSuccessStatusCode)
             {
@@ -124,6 +130,7 @@ namespace Service.Services
 
         public async Task<bool> UpdateAsync(T? entity)
         {
+            SetAuthorizationHeader();
             var idValue=entity.GetType().GetProperty("Id").GetValue(entity);
             var response= await _httpClient.PutAsJsonAsync($"{_endpoint}/{idValue}", entity);
             var content = await response.Content.ReadAsStringAsync();

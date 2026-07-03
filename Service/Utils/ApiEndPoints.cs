@@ -23,6 +23,7 @@ namespace Service.Utils
                 nameof(Usuario) => Usuario,
                 nameof(Inscripcion) => Inscripcion,
                 nameof(TipoInscripcion) => TipoInscripcion,
+                nameof(Login) => Login,
                 nameof(TipoInscripcionCapacitacion) => TipoInscripcionCapacitacion,
                 _ => throw new ArgumentException($"Endpoint '{name}' no está definido.")
             };
